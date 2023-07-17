@@ -28,7 +28,7 @@ jobs:
 
       - name: build
         env:
-          BASE_PATH: '/svelte-ai'
+          BASE_PATH: '/pixel-perfect'
         run: |
           pnpm run build
           touch build/.nojekyll
