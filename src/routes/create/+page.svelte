@@ -46,14 +46,14 @@
 </script>
 
 <!-- three columns -->
-<div class="flex">
+<div class="flex flex-col md:flex-row">
     <div
-        class="fixed top-0 right-0 h-screen w-16 m-0 p-2
-                flex flex-col last:mt-auto
+        class="md:fixed md:top-0 md:right-0 md:h-screen md:w-16 m-0 p-2
+                flex md:flex-col relative h-12 w-full align-middle items-center
                 bg-primary text-white shadow"
     >
         <a
-            class="avatar flex justify-center border-2 border-base-100 rounded-full"
+            class="w-10 md:w-12 avatar flex justify-center border-2 border-base-100 rounded-full"
             href="settings"
         >
             <div class="w-full rounded-full">
@@ -62,7 +62,7 @@
         </a>
         <!-- change theme button -->
         <button
-            class="w-10 mx-auto h-[22px] mb-4 mt-auto border-2 rounded-full border-base-100 relative"
+            class="w-10 md:mx-auto h-[22px] ml-auto md:mb-4 md:mt-auto border-2 rounded-full border-base-100 relative"
             on:click={toggleTheme}
         >
             <span
@@ -79,5 +79,73 @@
                 />
             </span>
         </button>
+    </div>
+    <div class="w-full md:w-1/4 h-[calc(25vh-1.5rem)] md:h-screen">
+        <div
+            class="flex md:flex-col md:w-full h-full items-center gap-6 overflow-auto
+                    pl-6 md:pl-0 md:pt-6"
+        >
+            <!-- plus -->
+            <a
+                class="w-10 h-10 min-w-[2.5rem] mx-4 md:mx-0 md:my-6 rounded-full bg-accent shadow-lg flex justify-center items-center"
+                href="create"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    class="stroke-base-100"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                </svg>
+            </a>
+            {#each Array(10) as _, i}
+                <div
+                    class="w-32 min-w-[8rem] md:min-w-0 md:min-h-[8rem] md:max-w-[10rem] h-3/4 md:w-3/4 md:h-32
+                        bg-base-300 rounded-lg shadow-lg"
+                >
+                    Card
+                </div>
+            {/each}
+        </div>
+    </div>
+    <div
+        class="w-full md:w-[calc(75%-4rem)] h-[calc(75vh-1.5rem)] md:h-screen
+                flex flex-col-reverse gap-3 overflow-auto pb-3 px-3"
+    >
+        <div class="form-control w-full">
+            <label class="input-group w-full justify-center">
+                <textarea
+                    placeholder="Image description"
+                    class="textarea textarea-bordered textarea-sm w-full max-w-lg"
+                />
+                <span>
+                    <button class="btn">Draw</button>
+                </span>
+            </label>
+        </div>
+        <div class="chat chat-end">
+            <div class="chat-header mb-1">
+                You
+                <time class="text-xs opacity-50">at 12:46</time>
+            </div>
+            <div class="chat-bubble bg-base-300 text-inherit">
+                You underestimate my power!
+            </div>
+        </div>
+        <div class="chat chat-start">
+            <div class="chat-header mb-1">
+                Ai
+                <time class="text-xs opacity-50">at 12:48</time>
+            </div>
+            <div class="chat-bubble bg-base-300 text-inherit">
+                It's over Anakin, <br />I have the high ground.
+            </div>
+        </div>
     </div>
 </div>
