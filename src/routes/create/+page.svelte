@@ -1,47 +1,25 @@
 <script lang="ts">
+    import type { PageData } from "./$types";
     import { onMount } from "svelte";
     import PocketBase from "pocketbase";
+    import { 
+        toggleTheme, 
+        getTheme, 
+        checkLoginAndRedirect,
+        getUserGithubImage
+    } from "$lib";
     const pb = new PocketBase("https://dev.opentrust.it/");
+    export let data: PageData;
     let userImg = "images/avatar.svg";
-
     let theme = "light";
-
-    function toggleTheme() {
-        if (theme === "dark") {
-            theme = "light";
-            document.documentElement.setAttribute("data-theme", "light");
-        } else {
-            theme = "dark";
-            document.documentElement.setAttribute("data-theme", "dark");
-        }
-    }
+    let selectedChat = -1;
+    $: chats = data.items ? data.items : [];
+    let chat = [];
 
     onMount(async () => {
-        // dark mode check
-        if (
-            window.matchMedia &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches
-        ) {
-            theme = "dark";
-        }
-        // login check
-        if (!pb.authStore.isValid) {
-            window.location.href = "login";
-        }
-        // get user
-        const user_id = pb.authStore.model?.id;
-        if (user_id) {
-            const record = await pb.collection("users").getOne(user_id);
-            if (record) {
-                const user_name = record.username;
-                //get avatar from github api
-                const response = await fetch(
-                    `https://api.github.com/users/${user_name}`
-                );
-                const data = await response.json();
-                userImg = data.avatar_url;
-            }
-        }
+        checkLoginAndRedirect(pb, "login");
+        theme = getTheme();
+        userImg = await getUserGithubImage(pb);
     });
 </script>
 
@@ -63,7 +41,7 @@
         <!-- change theme button -->
         <button
             class="w-10 md:mx-auto h-[22px] ml-auto md:mb-4 md:mt-auto border-2 rounded-full border-base-100 relative"
-            on:click={toggleTheme}
+            on:click={() => theme = toggleTheme(theme)}
         >
             <span
                 class="flex align-middle w-5 h-5 rounded-full p-[2px] bg-base-100
@@ -104,12 +82,12 @@
                     />
                 </svg>
             </a>
-            {#each Array(10) as _, i}
+            {#each chats as conversation, i}
                 <div
                     class="w-32 min-w-[8rem] md:min-w-0 md:min-h-[8rem] md:max-w-[10rem] h-3/4 md:w-3/4 md:h-32
-                        bg-base-300 rounded-lg shadow-lg"
+                        bg-base-300 rounded-lg shadow-lg flex justify-center items-center"
                 >
-                    Card
+                    <img class="max-h-full p-2" src={conversation.image} alt="thumb" />
                 </div>
             {/each}
         </div>
@@ -129,15 +107,6 @@
                 </span>
             </label>
         </div>
-        <div class="chat chat-end">
-            <div class="chat-header mb-1">
-                You
-                <time class="text-xs opacity-50">at 12:46</time>
-            </div>
-            <div class="chat-bubble bg-base-300 text-inherit">
-                You underestimate my power!
-            </div>
-        </div>
         <div class="chat chat-start">
             <div class="chat-header mb-1">
                 Ai
@@ -145,6 +114,23 @@
             </div>
             <div class="chat-bubble bg-base-300 text-inherit">
                 It's over Anakin, <br />I have the high ground.
+            </div>
+        </div>
+
+        <div
+            class="w-full min-h-[20rem] rounded-2xl max-w-md mx-auto bg-base-300
+                    flex justify-center items-center"
+        >
+            Image
+        </div>
+
+        <div class="chat chat-end">
+            <div class="chat-header mb-1">
+                You
+                <time class="text-xs opacity-50">at 12:46</time>
+            </div>
+            <div class="chat-bubble bg-base-300 text-inherit">
+                You underestimate my power!
             </div>
         </div>
     </div>
