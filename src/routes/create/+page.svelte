@@ -1,20 +1,37 @@
 <script lang="ts">
     import type { PageData } from "./$types";
     import { onMount } from "svelte";
-    import PocketBase from "pocketbase";
+    import PocketBase, { Record } from "pocketbase";
     import { 
         toggleTheme, 
         getTheme, 
         checkLoginAndRedirect,
         getUserGithubImage
     } from "$lib";
+    import { getChatImages } from "$lib/api";
+    import type { ChatItem } from "$lib/api";
+    import Chat from "$lib/chat.svelte";
     const pb = new PocketBase("https://dev.opentrust.it/");
     export let data: PageData;
     let userImg = "images/avatar.svg";
     let theme = "light";
     let selectedChat = -1;
-    $: chats = data.items ? data.items : [];
-    let chat = [];
+    let loading = false;
+    $: chats = data.chats ? data.chats : [];
+    let chat = [] as ChatItem[];
+
+    $: selectedChat, onChatChange();
+
+    function onChatChange(){
+        if (selectedChat >= 0) loading = true;
+        chat = [] as ChatItem[];
+        if (selectedChat >= 0) {
+            getChatImages(pb, chats[selectedChat].id).then(res => {
+                chat = res;
+                loading = false;
+            });
+        }
+    }
 
     onMount(async () => {
         checkLoginAndRedirect(pb, "login");
@@ -66,6 +83,7 @@
             <!-- plus -->
             <a
                 class="w-10 h-10 min-w-[2.5rem] mx-4 md:mx-0 md:my-6 rounded-full bg-accent shadow-lg flex justify-center items-center"
+                on:click={() => selectedChat = -1}
                 href="create"
             >
                 <svg
@@ -82,10 +100,13 @@
                     />
                 </svg>
             </a>
-            {#each chats as conversation, i}
+            {#each chats as conversation, i (conversation.id)}
                 <div
                     class="w-32 min-w-[8rem] md:min-w-0 md:min-h-[8rem] md:max-w-[10rem] h-3/4 md:w-3/4 md:h-32
                         bg-base-300 rounded-lg shadow-lg flex justify-center items-center"
+                    on:click={() => selectedChat = i} role="button" tabindex="0" on:keydown={e => {
+                        if (e.key == "Enter") selectedChat = i;
+                    }}
                 >
                     <img class="max-h-full p-2" src={conversation.image} alt="thumb" />
                 </div>
@@ -100,38 +121,13 @@
             <label class="input-group w-full justify-center">
                 <textarea
                     placeholder="Image description"
-                    class="textarea textarea-bordered textarea-sm w-full max-w-lg"
+                    class="textarea textarea-bordered textarea-sm w-full max-w-lg outline-none focus:outline-none"
                 />
                 <span>
                     <button class="btn">Draw</button>
                 </span>
             </label>
         </div>
-        <div class="chat chat-start">
-            <div class="chat-header mb-1">
-                Ai
-                <time class="text-xs opacity-50">at 12:48</time>
-            </div>
-            <div class="chat-bubble bg-base-300 text-inherit">
-                It's over Anakin, <br />I have the high ground.
-            </div>
-        </div>
-
-        <div
-            class="w-full min-h-[20rem] rounded-2xl max-w-md mx-auto bg-base-300
-                    flex justify-center items-center"
-        >
-            Image
-        </div>
-
-        <div class="chat chat-end">
-            <div class="chat-header mb-1">
-                You
-                <time class="text-xs opacity-50">at 12:46</time>
-            </div>
-            <div class="chat-bubble bg-base-300 text-inherit">
-                You underestimate my power!
-            </div>
-        </div>
+        <Chat chat={chat} loading={loading} />
     </div>
 </div>

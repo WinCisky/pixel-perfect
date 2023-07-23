@@ -1,15 +1,14 @@
 import type { PageLoad } from "./$types";
 import PocketBase from "pocketbase";
 import { getImageFilePath } from "$lib";
+import { getChatData } from "$lib/api";
 
 export const load = (async () => {
   const pb = new PocketBase("https://dev.opentrust.it/");
-  const resultList = await pb.collection("pixel_chats").getList(1, 10, {
-    sort: "-created",
-  });
+  const resultListChats = await getChatData(pb, 1);
 
   // only get the id and image, fix the image url
-  let items = resultList.items.map((item) => {
+  let chats = resultListChats.items.map((item) => {
     return {
       id: item.id,
       image: getImageFilePath(
@@ -23,5 +22,5 @@ export const load = (async () => {
     };
   });
 
-  return { "items": items };
+  return { "chats": chats };
 }) satisfies PageLoad;
