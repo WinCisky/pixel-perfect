@@ -7,10 +7,10 @@
     async function authWithGithub() {
         const authData = await pb.collection('users').authWithOAuth2({ provider: 'github' });
 
-        // after the above you can also access the auth data from the authStore
-        console.log(pb.authStore.isValid);
-        console.log(pb.authStore.token);
-        console.log(pb.authStore.model?.id);
+        // // after the above you can also access the auth data from the authStore
+        // console.log(pb.authStore.isValid);
+        // console.log(pb.authStore.token);
+        // console.log(pb.authStore.model?.id);
 
         if (pb.authStore.isValid){
             window.location.href = 'create';

@@ -9,7 +9,7 @@
             const user_id = pb.authStore.model?.id;
             if (user_id){
                 const record = await pb.collection('users').getOne(user_id);
-                console.log(record.username);
+                // console.log(record.username);
             }
         }
     })();
